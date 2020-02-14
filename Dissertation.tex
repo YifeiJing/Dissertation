@@ -108,7 +108,7 @@
         oil fuel and gas using completely clean electricity power resources like wind, hydrogen, and sunlight. 
         
         To increase wind generation capacity, an innovative Active Network Management (ANM) system was set up in 2009 to allow operators to connect wind farm generation to the grid \cite{website:ANM}. 
-        Behold to ANM, the capacity of wind generation has been growing dramatically from 15.5 MW in 2009 to 47.7 MW in 2019 \cite{report:OrkneyAudit}, which is depicted in Fig \ref{fig_cummulative_wind_capacity}. 
+        Behold to ANM, the capacity of wind generation has been growing dramatically from 15.5 MW in 2009 to 47.7 MW in 2019 \cite{report:OrkneyAudit}, which is depicted in \hyperref[fig_cummulative_wind_capacity]{Figure \ref*{fig_cummulative_wind_capacity}}. 
         
         \begin{figure}[ht]
             \centerline{\includegraphics[scale=1]{cummulativewindcapacity}}
@@ -124,7 +124,7 @@
         from fossil demand to electricity demand, improving the gas heating types of 
         equipment to the electrical heating ones, and installing wind turbines with local 
         storage for households to achieve energy trades among customers. 
-        Additionally, the number of EVs has been increasing drastically from a relatively small group to 234 in the first quarter of 2019 \cite{report:OrkneyAudit}, as is indicated in \hyperref[fig_EV_number]{Fig \ref*{fig_EV_number}}.
+        Additionally, the number of EVs has been increasing drastically from a relatively small group to 234 in the first quarter of 2019 \cite{report:OrkneyAudit}, as is indicated in \hyperref[fig_EV_number]{Figure \ref*{fig_EV_number}}.
         The rate of growth is 975\% in 5 years. The reason of this high grow speed is that on the one hand distributed wind turbines and local energy reserve storage can be installed in Orkney, which increase the accessibility of electric power with cheaper price, on the other hand, the community of Orkney provides charging stations which can charge EVs without fee (This service was turned to be paid charging scheme in 2019 April \cite{report:OrkneyAudit}).
 
         \begin{figure}[ht]
@@ -332,7 +332,29 @@
         There is also a trade-off between the degree and generalization of the model. As high degrees are easy to introduce overfitting, but that does not mean low degree is good. When the cost function can not decrease to an acceptable range no matter how much data has been fed, it is time to increase the degree. Low degree always introduces underfitting or high cost function.
 
         \subsection{Binomial regression}
+        The Binomial regression model uses boolean value as the target value. It is used to implement classifier, for example, to judge whether a mail is a junk mail from the information of title, and to identify whether a curtailment has happened based on the wind generation power and demand in this project.
+        Because the target attribute is not a numeric value, it is not appropriate to use metrics like \emph{MSE} or \emph{RMSE} to train and evaluate the model. Instead, the \emph{Type I} and \emph{Type II} errors are introduced.
+
+        \subsubsection{\emph{Type I} and \emph{Type II} error}
+        \emph{Type I} error is also called false positive, which refers to true hypothesis that is rejected by the decision. \emph{Type II} error is called false negative, which refers to false hypothesis not rejected by the decision. The concepts of these errors can be demonstrated in \hyperref[table_error_types]{Table \ref*{table_error_types}} \cite{website:typeItypeIIerror}.
+        \begin{table}[ht]
+            \centering
+            \begin{tabulary}{\linewidth}{|C |C| C|}
+                \hline
+                 & True & False \\
+                \hline
+                Don't reject & Correct inference (true positive) $possibility = 1-\alpha$ & Type II error (false positive) $possibility = \beta$ \\
+                \hline
+                Reject & Type I error (true negative) $possibility = \alpha$ & Correct inference (false negative) $possibility = 1-\beta$ \\
+                \hline
+            \end{tabulary}
+            \caption{Table of error types}
+            \label{table_error_types}
+        \end{table}
         
+        It is necessary to notice that to eliminate one type error, the other type error must grow, but by selecting a low threshold, an optimal $\alpha$ can be achieved to increase the quality of judgement.
+
+        In the machine learning field, the \emph{Confusion matrix} is implemented based on the error types. It has two rows and two columns which count the predictions under different error types or correct inferences.
         \section{Simulation frameworks}
         Two kinds of simulation frameworks have been considered in this project: \emph{event-driven simulation} and \emph{analytic simulation}.
         Both of them are introduced in this section.
@@ -384,11 +406,121 @@
         \hyperref[fig_structure_of_event_driven]{Figure \ref*{fig_structure_of_event_driven}} shows the basic structure of a \emph{Event-driven} simulation system. Fow a power grid simulation system, the model components could be wind power generator, grid, EV, house, appliance. The state should be the time, because the consumption is assumed to be a function of time, for example, the household demand profile in \cite{report:household} is a function of time of the day, the season, the house type and house owner.
 
         \subsection{\emph{Analytic simulation}}
+        \label{text_nasa_trick}
         Unlike the former strategy, this strategy is more generally applied, as its idea is easy to understand: analyze the model based on a some variables \footnote{Usually take the time as the variable, as most real-world model are based on time, or should be simulated by time.} for a specified amount of cycles. The core of this framework is the \emph{scheduler}, which intialize the model, run analytic functions for instructed number of cycles and terminate the model. It is like the \emph{Schema} in previous framework, but all of the actions have been determined before the simulation begin, and no new actions will be added during simulation. The action in the \emph{Analytic simulation} is called the \emph{Scheduled job} which is provided by the model.
         Take the power grid as an example. Models of grid, wind generation, house, EV and other objects in one grid should be implemented first, so that they can be added to the scheduler to be initialized. These models should contain an analytic function to be called on each simulation cycle by the scheduler, a termination function to be called at the end of the simulation, to summarize the results, such as the average value, the socre of special metrics.
 
         In this project, a simulation environment based on \emph{Analytic Simulation} called \emph{trick} \cite{website:trick} is used for simplicity. The reason is that it provides the interface of implementing model in \emph{C/C++}. Then the jobs can be scheduled using a script which includes the model and functions exposed to be called for intialization, analysis, and termination. Additionally, a versatile logger is provided. 
 
+        \section{Household loading profile}
+        In \hyperref[text_simulatinghouseholdload]{Section \ref*{text_simulatinghouseholdload}}, a daily household loading profile is needed to support simulation. The basic strategy is to first divide all electrical devices to three types based on their behaviors, and apply each appliance with the model of its type and general consumption data. A research has been delivered in \cite{paper:devicestypes}, and the results can be summarized in \hyperref[table_electrical_devices]{Table \ref*{table_electrical_devices}}.
+
+        \begin{table}[ht]
+            \centering
+            \begin{tabulary}{\linewidth}{|p{1.1cm}|p{3.3cm} | p{3.3cm}| p{3.3cm}|}
+                \hline
+                 & Even-smooth type & Stochastic behavior type & Fixed-program type \\ \hline
+                 Device & Fridge freezer, Wine cabinet & TV-set, Total light, Electrical cooker, Microwave, Dish washer, Washing machine, Clothes dryer & Water heater, Air conditioner \\ \hline
+                 Feature & Base load, Continuously working, Smooth load, Low power consumption & Randomly plug in, Randomly working period, Possible peak load, Medium power consumption & Randomly plug in, Fixed working period, High power consumption \\
+                \hline
+            \end{tabulary}
+            \caption{Typical household electrical devices}
+            \label{table_electrical_devices}
+        \end{table}
+
+        To model the Even-smooth type device, the consumption is generated periodically. To model the Stochastic behavior type and Fixed-program type, statistical algorithms are used to simulate the randomness. Typical consumption data is extracted from the UK household electricity survey \cite{report:household}.
+
+        \section{EV charging profile}
+        \label{text_EV_charging_profile}
+        Three categories of typical voltage and power levels of EV charging have been derived from \cite{paper:evchargingprofile} and summarized in \hyperref[table_standard_electric_vehicle_charging_level]{Table \ref*{table_standard_electric_vehicle_charging_level}}.
+        The Level 1 and Level 2 are mostly used in single-family residential and multifamily residential. Level 3 is for commercial situations. These three charging consumptions are defined by the Society of Automotive Engineers \cite{website:sae}, and all U.S. EV makers must follow this standard.
+        \begin{table}[ht]
+            \centering
+            \begin{tabulary}{\linewidth}{|C | C | C | C | C|}
+                \hline
+                 & Voltage (VAC) & Current (Amps) & Power (kVA) & Phase \\
+                \hline
+                Level 1 & 120 & 12 & 1.44 & Signle \\ \hline
+                Level 2 & 208/240 & 32 & 6.7/7.7 & Signle \\ \hline
+                Level 3 & 208/480/600 & 100 & 16.8 & Three \\
+                \hline
+            \end{tabulary}
+            \caption{Standard Electric Vehicle Charging Level}
+            \label{table_standard_electric_vehicle_charging_level}
+        \end{table}
+
+        In addition, \hyperref[table_typical_ev_charging_time]{Table \ref*{table_typical_ev_charging_time}} provides typical charging time for various sizes of EVs.
+
+        \begin{table}[ht]
+            \centering
+            \begin{tabulary}{\linewidth}{|C | C | C | C | C |}
+                \hline
+                EV Configuration & Battery Size (kWh) & 120 V and 12 Amps & 240 V and 32 Amps & 480 V and 100 Amps \\
+                \hline
+                PHEV-10 & 4 & 3h 5m & 35m & n/a \\ \hline
+                PHEV-20 & 8 & 6h 10m & 1h 10m & n/a \\ \hline
+                PHEV-40 & 16 & 12h 20m & 2h 20m & 63m \\ \hline
+                BEV & 24 & 18h 30m & 3h 30m & 1h 34m \\ \hline
+                PHEV Bus & 50 & n/a & 5h 50m & 3h 17m \\
+                \hline
+            \end{tabulary}
+            \caption{Typical EV Charging Time}
+            \label{table_typical_ev_charging_time}
+        \end{table}
+
+        Combine the information of two tables, the Level 1 charging is more suitable for charging overnight, and Level 2 could be the standard method of charging as it support all five types. Level 3 is designed for public charging facilities for large types of EVs.
+
+        However, these profiles only estimate ideal conditions where the charging outlets are fully powered and the EVs have run out of battery capacity. 
+        
+        
+        \begin{figure}[ht]
+            \centerline{\includegraphics[scale=1]{averageEVchargingamount}}
+            \caption{Average kWh/day over course of week for residential charging for an average EV}
+            \label{fig_average_ev_charging}
+        \end{figure}
+
+        In the Electric Vehicle charging behavior study \cite{report:EVchargingstudy}, the amount of demand of an average EV and the time of charging differs from different week days as it is demonstrated in \hyperref[fig_average_ev_charging]{Figure \ref*{fig_average_ev_charging}}.
+
+        The amount is merely reaching 4.0 kWh for an EV, thus it should be acknowledged that if the EVs are recharging every day, they are not likely to cost as much as the time in the table. A daily trend can also be detected that there is a gradual increase between Monday to Thursday before a slight decrease on Friday and then a lower level on Saturday and Sunday.
+        The distribution of charging demand among the period of a day is also studied in \hyperref[fig_weekly_demand_profile]{Figure \ref*{fig_weekly_demand_profile}}. The profile indicates a demand peak on evening time with a maximum between 7-8pm on weekdays and 6-7pm on weekends. The demand profile spread broadly on weekends with a lower maximum.
+
+        \begin{figure}[ht]
+            \centerline{\includegraphics[scale=1]{EVchargingdistribution}}
+            \caption{Weekly demand profile of an average EV for residential charging}
+            \label{fig_weekly_demand_profile}
+        \end{figure}
+
+        Additionally, this demand profile can be combined with the histogram of departure and arrival of a typical household in \hyperref[fig_arrival_vs_departure]{Figure \ref*{fig_arrival_vs_departure}}. The departure behaviors can be projected to the low demand in the morning, and the arrivals in the evening indicates that people are recharging their EVs, thus this results in a peak demand in that morning.
+
+        \begin{figure}[ht]
+            \centerline{\includegraphics[scale=1.9]{evdepartures}}
+            \caption{Arrival and departure study of a day}
+            \label{fig_arrival_vs_departure}
+        \end{figure}
+
+        The statistics of EVs in Orkney is summarized in \hyperref[table_current_condition_of_EVs]{Table \ref*{table_current_condition_of_EVs}}, which is derived from \cite{report:OrkneyAudit}. The number of EVs in Orkeny takes up to 1.4\% of all vehicles on the island.
+
+        \begin{table}[ht]
+            \centering
+            \begin{tabulary}{\linewidth}{|C | C | C | C |}
+                \hline
+                Average Miles Per Day & Average MWh Per Mile & Number of EVs Registerd in Orkney & Estimated Annual Energy COnsumed by Orkney EVs (MWh) \\ \hline
+                21.74 & 0.000299 & 234 & 555 \\
+                \hline
+            \end{tabulary}
+            \caption{Current condition of EVs in Orkney}
+            \label{table_current_condition_of_EVs}
+        \end{table}
+
+        \section{Methods on exploring impacts of different levels of EV penetration in grid}
+        The instant power consumption of the charging outlets shown in \hyperref[table_standard_electric_vehicle_charging_level]{Table \ref*{table_standard_electric_vehicle_charging_level}} implies that a lot of EVs charging at the same time will increase the peak demand and may cause the instability of the grid. Previously, many papers have focused on this scenario.
+
+        Three levels of penetration are considered in \cite{paper:PieltainFernandez2011}: 35\% in 2020, 51\% in 2035, and 62\% in 2050, along with two types of charging mode: normal charing, and quick charging according to Level 1 and Level 2 of \hyperref[table_standard_electric_vehicle_charging_level]{Table \ref*{table_standard_electric_vehicle_charging_level}}. The author uses a replica of power grid in two areas and tests impacts of three charging strategies. The model of EV charging is a presumption that 85\% of the EVs are connected in the morning and 40\% are coonected in the peak time. The results show that the investment could increase up to 40\% under off-peak charging strategt adn the largest penetration level. However, the power source of the grid is not considered, as it is assumed that the main power source is the wind, an intermittent power resource. Nor the model of grid is too complicated to be recovered.
+
+        Another research also focues on two charging modes without a replica of the gird \cite{paper:Shao2010}. Instead, the author builds a probability model to simulate the EV arrivals and departures. Three charging strategies are also considered. But the objective is on Time-of-use pricing.
+
+        A hybird of these two researches is \cite{paper:Qian2011}, where a replica of power grid and probability of arrival and departure model is used. Three penetration levels: 0\%, 10\%, and 20\% are tested in this research. The objective is the demand profile of the grid. This research should be a good start of this project. However, the probability model is not able to implemented from the formulas provided.
+        
     \chapter{Work}
         \section{Establish a dataset from available source}
         A dataset is constructed to acquire understanding of power generation and demand in Orkney. The data set began to scrape data from 19th October. 
@@ -718,21 +850,160 @@
                         \caption{The wind speed versus power generation on 12-02}
                         \label{plot_speed_vs_power_1202}
                     \end{figure}
-                
-                    If the whole dataset is selected, as \hyperref[plot_speed_vs_power_whole]{Figure \ref*{plot_speed_vs_power_whole}} indicated, various curtailment conditions will definitely affect the model. As the red colored rectangle emphasized, the value generation of 2.5 m/s to 7.5 m/s has approximitely the same range of value which cannot be appropriately understood by the algorithms.
 
                     \begin{figure}[ht]
                         \centerline{\includegraphics[scale=0.2]{generationvsspeedwholeset}}
                         \caption{The wind speed versus power generation on the whole dataset}
                         \label{plot_speed_vs_power_whole}
                     \end{figure}
+                
+                    If the whole dataset is selected, as \hyperref[plot_speed_vs_power_whole]{Figure \ref*{plot_speed_vs_power_whole}} indicated, various curtailment conditions will definitely affect the model. As the red colored rectangle emphasized, the value generation of 2.5 m/s to 7.5 m/s has approximitely the same range of value which cannot be appropriately understood by the algorithms.
+
+                    \subsubsection{Modeling the relation of wind speed and power generation}
+                    Two linear regression methods are tested on this relation: linear regression, and polynomial linear regression. As the red line shows, the linear regression of the first order should be separated into two regions. The case for the second order linear regression is easy to apply on the whole wind speed interval.
+
+                    
+                    The resultant parameters of two regression models along with their Mean squared error are shown in \hyperref[table_two_model]{Table \ref*{table_two_model}}. These two regression strategies both result in an acceptable \textbf{MSE}, thus it is appropriate to use both of them to predict wind power generation from the speed.
+
+                    \begin{table}[ht]
+                        \centering
+                        \begin{tabulary}{\linewidth}{|C C C C C|}
+                            \hline
+                            model & intercept & $a_1$ & $a_2$ & MSE\\ \hline
+                            linear & $7.5$ & $3.75$ & $0$ & $14.4$ \\ \hline
+                            polynomial & $5.1$ & $5.22$ & $-0.19$ &  $15.05$ \\
+                            \hline
+                        \end{tabulary}
+                        \caption{Parameters of two linear regression model on wind speed to power generation on 12-02}
+                        \label{table_two_model}
+                    \end{table}
+
+                    It should be noted that the reason why the conditions happen in the rectangle region of \hyperref[plot_speed_vs_power_whole]{Figure \ref*{plot_speed_vs_power_whole}} is that the curtailment occurs whenever the demand cannot fully follow the generation capacity to sustain the stability of the grid.
+                    
+                    \subsubsection{Modeling the relation of curtailment and power generation}
+                    Under the condition that the demand is enough large that no curtailment occurs, the wind speed-to-generation model derived in the previous section is approximating the power generation well. However, according to statistics of last few years, the time of curtailment takes up to 31\% of all time periods. Another model modeling the generation under curtailment should be added to include all conditions in the wind power generation model.
+
+                    The assumption is that, when the curtailment happens, some wind turbines are cut out, causing the power generation being limited to a level slightly above the demand.
+                    This assumption is expressed as:
+                    \begin{equation}
+                        Generation \leq Live Demand + k
+                        \label{equation_Generation_to_demand_curtailment}
+                    \end{equation}
+                    The crux is to find the optimal value of $k$. Using the wind speed-to-generation model to predict the power generation of the full capacity, then add $k$ to the current demand. If the generalization is higher than this value, this time slot will be marked as curtailment happen. Comparing the predictions of curtailment with the collected ANM status data using the \emph{Confusion matrix} in \hyperref[table_error_types]{Section \ref*{table_error_types}}.
+                    To acquire the value $k$ which fits in a general scenario, the curtailment data of nine regions is transformed into a single boolean value which is true if at least two regions have reported curtailment. The linear speed-to-generation model is the polynomial model, and the values of $k$ range from 1 to 20.
+
+                    \begin{table}[ht]
+                        \centering
+                        \begin{tabulary}{\linewidth}{C C C C C C C C C C C}
+                            \hline
+                            k & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\ \hline
+                            Type I
+                            & 0.02 & 0.03 & 0.04 & 0.05 & 0.06 & 0.07 & 0.08 & 0.11 & 0.13 & 0.18\\ \hline
+                            Type II
+                            & 0.53 & 0.50 & 0.46 & 0.41 & 0.37 & 0.34 & 0.31 & 0.25 & 0.20 & 0.17\\ \hline
+                            k & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20\\ \hline
+                            Type I
+                            & 0.22 & 0.28 & 0.35 & 0.42 & 0.52 & 0.60 & 0.68 & 0.74 & 0.79 & 0.86\\ \hline
+                            Type II
+                            & 0.14 & 0.11 & 0.09 & 0.07 & 0.05 & 0.05 & 0.04 & 0.02 & 0.02 & 0.01\\ \hline
+                        \end{tabulary}
+                        \caption{Type errors of parameter $k$}
+                        \label{table_type_error_k}
+                    \end{table}
+                    \hyperref[table_type_error_k]{Table \ref*{table_type_error_k}} shows the scores of this binomial regression model. The perfomance is relatively high \footnote{By taking the average of the two type error for each k or the weighted sum of them, as the target is to predict the occurrence of curtailment, not the normal mode.} when $k = 8,9,10$. Taking the median of them and the model is constructed as:
+                    \begin{equation}
+                        Generation \leq Live Demand + 9
+                    \end{equation}
+
 
             \section{Over-all EV effects}
-                \subsection{Characterize EV charging events}
-                \subsection{Analyze different penetration level}
+            To analyze the demand of EVs, it is necessary to first construct the model of demand, then it can be synthesized with the Live demand model derived in the provious section. 
+
+            As it is elaborated in \hyperref[text_EV_charging_profile]{Section \ref*{text_EV_charging_profile}} that the demand of EVs to the grid is determined by the charging station type and the capacity of batteries. Besides the power approximation, the demand in timeseries should be characterized using the charging events model, which is statistically fitting to the histogram of arrivals and departures in \hyperref[fig_arrival_vs_departure]{Figure \ref*{fig_arrival_vs_departure}}.
+
+            In this section, the charging events model is first designed. It is fundamentally necessary to the model of demand of EVs and the implementation of simulating EV charging. Then, the effects of different penetration levels of EVs will be analyzed.
+
+                \subsection{Characterizing EV charging events}
+                To characterize the charging events of EVs, several presumptions are first promoted: (1) All of the EVs are charged only one time each day, and they are charged equivalent amount of energy. (2) Only one type of EV is considered to unify the capacity of batteries. (3) Bidirectional power transportation technologies: V2G, V2H, and V2V \cite{paper:v2g}, are not considered to decrease the degree of complexity.
+
+                From \hyperref[fig_arrival_vs_departure]{Figure \ref*{fig_arrival_vs_departure}}, it seems that there are two peak arrival time each day: 12:00 and 18:00, and the latter is larger. The first distribution is extracted from \cite{paper:Shao2010}, which uses a normal distribution with $\mu = 18:00, \sigma = 1$, implying that the peak time is at 18:00, and most EVs arrive in the range $15:00 - 21:00$ \footnote{The interval is 3 standard deviations of the mean, which covers 99.7\% of the data \cite{website:normaldistribution}. Actually, $\sigma$ can be slightly larger as there are still arrivals after 22:00.}.
+                Using the random number generation module of \emph{Numpy}, it is possible to produce a set of charging start points with the number of EVs provided. \hyperref[fig_normal_histogram]{Figure \ref*{fig_normal_histogram}} shows a histogram of samples in this distribution.
+
+                \begin{figure}[ht]
+                    \centerline{\includegraphics[scale=1.3]{normalHistogram}}
+                    \caption{The Histogram of the samples generated by a Normal distribution of $\mu = 18, \sigma = 1$}
+                    \label{fig_normal_histogram}
+                \end{figure}
+
+                There are 234 EVs in Orkney (\hyperref[table_current_condition_of_EVs]{Table \ref*{table_current_condition_of_EVs}}), and the total daily demand can be calculated: $ W_{perday} = 21.74 * 0.299 = 6.5 kW h$. Two charging modes are considered in this scenario: 110V/15A * 5.5h as the Normal charging, and 240V/30V * 1.5h as the quick charging.
+                Under such condition, the demand caused by the charging events can be visulized in \hyperref[fig_charging_demand_234]{Figure \ref*{fig_charging_demand_234}}. The differences on instant charging power and length of charging periods lead to significant demand profiles of the two modes. The peak value of Quick charging is over 2 times higher than that of the normal charging mode and the peak value reaches about 2 hours earlier than the Normal charging mode \footnote{It also implies a possible solution to delay the demand peak time by transfrom Quick charging to normal charging.}.
+
+                \begin{figure}[ht]
+                    \centerline{\includegraphics[scale=1]{chargiingEventsOriginPenetration}}
+                    \caption{The demand profile of 234 EVs under two charging mode}
+                    \label{fig_charging_demand_234}
+                \end{figure}
+
+                Despite the demand profile derived from one peak time, a more pragmetic approximation can be constructed by two normal distributions centering at 12:00 and 18:00, repectively. The idea behind the choice of these two center point is to acheve a replica of the Arrivals vs Depature Histogram in \hyperref[fig_arrival_vs_departure]{Figure \ref*{fig_arrival_vs_departure}}.
+
+                The histogram of the charging events and the demand profile of this new approximation are demonstrated in \hyperref[fig_two_peak_histogram]{Figure \ref*{fig_two_peak_histogram}} and \hyperref[fig_charging_demand_234_2]{Figure \ref*{fig_charging_demand_234_2}}.
+                \begin{figure}[ht]
+                    \centerline{\includegraphics[scale=1.5]{twoPeakHist}}
+                    \caption{The Histogram of the samples generated by two normal distributions at 12:00 and 18:00}
+                    \label{fig_two_peak_histogram}
+                \end{figure}
+
+                \begin{figure}[ht]
+                    \centerline{\includegraphics[scale=1]{chargingEventsTwoPeak}}
+                    \caption{The demand profile of 234 EVs with two charging peak time}
+                    \label{fig_charging_demand_234_2}
+                \end{figure}
+
+                \subsection{Analyzing different penetration levels}
+                The current penetration level 1.4\% has not attached a threat to the grid. If all EVs are recharged in one day, the total consumption is $6.5 * 234 = 1521 kW h$, while the island total demand on a daily average is $469 MW h$. This little consumption can be visulized in \hyperref[fig_1.4_syn]{Figure \ref*{fig_1.4_syn}}, where merely a slight increase at night can be detected.
+
+                \begin{figure}[ht]
+                    \centerline{\includegraphics[scale=1]{currentsyn}}
+                    \caption{The Synthesized demand profile of 1.4\% EV penetration}
+                    \label{fig_1.4_syn}
+                \end{figure}
+
+                Comparing to the prediction of EV penetration in \cite{paper:Vazquez2010} that the percentage is 35\% in 2020, this penetration level is over-estimated.
+                Three penetration levels: 10\%, 20\%, and 30\% are tested on current demand profile. \hyperref[table_demand_statistics_three_penetration_level]{Table \ref*{table_demand_statistics_three_penetration_level}} shows the results after adding the charging events at centering at 18:00.
+                The scenario without EVs is also estimated by subtrating the 1.4\% EV consumption from the demand profile, then new penetrations are tested. During the process of increasing the penetration from 10\% to 30\%, the total energy demand, which can be estimated from the mean values, is increasing over 10\%, the max instant power consumption increases about 30\% for Normal charging and 80\% for Quick charging. The time is delayed to after 8 o'clock in the evening for Normal charging, and 6 o'clock in the evening for Quick charging.
+
+                \begin{table}[ht]
+                    \centering
+                    \begin{tabulary}{\linewidth}{C C C C}
+                        \hline
+                         & Mean & Max & Peak Time \\ \hline
+                        No EV & 19.6 & 22.88 & 15:40 \\ \hline
+                        10\% (Normal) & 20.11 & 24.14 & 18:10 \\ \hline
+                        10\% (Quick) & 20.23 & 28.91 & 18:20 \\ \hline
+                        20\% (Normal) & 20.74 & 26.44 & 20:10 \\ \hline
+                        20\% (Quick) & 20.98 & 34.7 & 18:20 \\ \hline
+                        30\% (Normal) & 21.37 & 29.19 & 20:10 \\ \hline
+                        30\% (Quick) & 21.73 & 41.36 & 20:10 \\ 
+                        \hline
+                    \end{tabulary}
+                    \caption{The statitics of demand under three penetration levels}
+                    \label{table_demand_statistics_three_penetration_level}
+                \end{table}
+
+                A more obvious impression is available by plotting the demand profile of the 30\% penetration in \hyperref[fig_penetration_30]{Figure \ref*{fig_penetration_30}}, where a single charging interval is too significant to accept as a rational estimation. The reason may be that the 30\% is impossible for current demand level, and it is also an estimation of maximum with all EVs using Quick charging mode, which implies that the real consumption should lie between the Quick mode and the Normal mode. Additionally, if the distribution of two peak times is considered, the peak value will be allivated and the peak value will be distributed to two mountains on the graph.
+
+                \begin{figure}[ht]
+                    \centerline{\includegraphics[scale=1]{penetration_30}}
+                    \caption{The demand profile under the 30\% penetration of EVs}
+                    \label{fig_penetration_30}
+                \end{figure}
             
             \section{Implementing the simulation model of the grid}
+            In this section, the details of the implementation of the simulation model are recorded. This simulation model is designed under the \emph{NASE Trick} simulation environment, which has been introduced in \hyperref[text_nasa_trick]{Section \ref*{text_nasa_trick}}. The whole grid model is separated into several independent models: household loading model, EV charing model, wind model, and storage model. The deliberate design of these parts makes is possible to simulate each single part without the couple of other elements, and it is better for test. Later these models are intergrated into the whole grid model.
+            Each model has four common methods: default, init, analytic, and terminate. The `default' method is for 
                 \subsection{Simulating Household load}
+                \label{text_simulatinghouseholdload}
+                The house contains various appliances which have specific characteristics. 
                 \subsection{Simulating EV charging load}
                 \subsection{Simulating wind generation}
                 \subsection{Simulating grid storage}
