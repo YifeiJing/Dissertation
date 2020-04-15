@@ -21,7 +21,7 @@
 \rhead{\rightmark}
 % \lhead{\leftmark}
 \cfoot{\thepage}
-
+\setcounter{secnumdepth}{4}
 % \usepackage{layout}
 % \usepackage{showframe}
 \hypersetup{
@@ -1108,7 +1108,7 @@
                 \subsection{Simulating grid storage}
                 The storage is simply a battery, which is recharged when the demand is lower than the generation, and is discharged when the generation cannot satisfy current demand. When SoC is empty and the demand is higher than the generation, the imported energy is used. When SoC is full and the generation is higher than the demand, the curtailment is set to cut down some wind turbines and export energy.
 
-            \section{Determination of storage}
+            \section{Determining the storage}
             The implementation of the simulation has been elaborated, while two important parameters have not been determined: the scale factor of the wind farm and the storage of the grid. 
 
             \subsection{Determining the scale of the wind farm}
@@ -1197,30 +1197,6 @@
                 \caption{The performance of the storage under the normal charging strategy}
                 \label{fig_normal_charging}
             \end{figure}
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_normal_10}}
-            %     \caption{The performance of the storage under 10\% penetration with the normal charging strategy}
-            %     \label{fig_simu_score_normal_10}
-            % \end{figure}
-
-
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_normal_20}}
-            %     \caption{The performance of the storage under 20\% penetration with the normal charging strategy}
-            %     \label{fig_simu_score_normal_20}
-            % \end{figure}
-
-            % \hyperref[fig_simu_score_normal_10]{Figure \ref*{fig_simu_score_normal_10}} shows the score under 10\% penetration. It can be found that most scores increases to 0.5, and the maximum score moves to higher capacity. The higher capacities behave better with lower over-discharge scores, while the performance is still not significant enough.
-
-            % \hyperref[fig_simu_score_normal_20]{Figure \ref*{fig_simu_score_normal_20}} illustrates the results of 20\% penetration. As more EVs drive the demand to a higher value, lower capacities tend to show the lack of storage. Though most of the capacities in the middle region still have a score over 0.5, the over-discharge ratio is increasing. The higher capacities behave much better than before, and 100 MW h reaches 0.7 with a small over-discharge ratio. 
-            
-            % \hyperref[fig_simu_score_normal_40]{Figure \ref*{fig_simu_score_normal_40}} plots the scores under 40\% penetration. With a high penetration, the score drops and the over-discharge rate increases significantly. At this penetration level, only several capacities over 80 MW h can reach the score of 0.5. The result of this penetration level is implying that the generation cannot fully satisfy the demand anymore, as the average SoC in \hyperref[table_high_storage_40]{Table \ref*{table_high_storage_40}} indicates that all capacities have a low average SoC near the low boundary of battery health. The reason why the averages are all at 20s is that the power generation cannot fully charging the battery at this penetration level.
-            
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_normal_40}}
-            %     \caption{The performance of the storage under 40\% penetration with the normal charging strategy}
-            %     \label{fig_simu_score_normal_40}
-            % \end{figure}
             
             \begin{table}[ht]
                 \centering
@@ -1235,6 +1211,7 @@
                 \label{table_high_storage_40}
             \end{table}
 
+            \newpage
             \subsection{Impacts of delay charging strategy}
             This section shows the results of delay charging strategy based on the same simulation schema in testing normal charging strategy.
 
@@ -1251,26 +1228,7 @@
                 \label{fig_delay_charging}
             \end{figure}
             
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_delay_10}}
-            %     \caption{The performance of the storage under 10\% penetration with the delay charging strategy}
-            %     \label{fig_simu_score_delay_10}
-            % \end{figure}
-
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_delay_20}}
-            %     \caption{The performance of the storage under 20\% penetration with the delay charging strategy}
-            %     \label{fig_simu_score_delay_20}
-            % \end{figure}
-
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_delay_40}}
-            %     \caption{The performance of the storage under 40\% penetration with the delay charging strategy}
-            %     \label{fig_simu_score_delay_40}
-            % \end{figure}
-
-            % \subsection{Impacts of smart charging strategy}
-            % This section shows the results of smart charging strategy based on the same simulation schema in testing normal charging strategy.
+            \newpage
             \subsection{Impacts of smart charging strategy}
             This section shows the results of smart charging strategy based on the same simulation schema in testing normal charging strategy.
 
@@ -1286,24 +1244,6 @@
                 \caption{The performance of the storage under the smart charging strategy}
                 \label{fig_smart_charging}
             \end{figure}
-
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_smart_10}}
-            %     \caption{The performance of the storage under 10\% penetration with the smart charging strategy}
-            %     \label{fig_simu_score_smart_10}
-            % \end{figure}
-
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_smart_20}}
-            %     \caption{The performance of the storage under 20\% penetration with the smart charging strategy}
-            %     \label{fig_simu_score_smart_20}
-            % \end{figure}
-
-            % \begin{figure}[ht]
-            %     \centerline{\includegraphics[scale=0.9]{simu_score_smart_40}}
-            %     \caption{The performance of the storage under 40\% penetration with the smart charging strategy}
-            %     \label{fig_simu_score_smart_40}
-            % \end{figure}
 
     \chapter{Conclusion}
     %The last chapter of your report must cover the conclusions. You discuss (briefly) the problems that arose which you had not anticipated, and how, as a result of this knowledge you would change the project. You discuss the projects limitations and discuss how these may be overcome. In short, you are clarifying the situation for the person who shall follow you and continue the project by pointing out where he needs to direct most of his efforts. As the project is only intended to create a prototype (except in certain special circumstances) there should be many useful modifications which you can suggest, and much from what you have experienced in your project work that you can impart to others. Consequently, of all the chapters in your report, the conclusions are probably the ones which best portrays your ability as an engineer.
@@ -1348,8 +1288,9 @@
 
         \hyperref[table_res_sum]{Table \ref*{table_res_sum}} shows the best score on each mode under each penetration level. Except the delay mode, other modes meet an increase on the storage capacity to accommodate more EVs. The main tendency is that the grid storage needs more than $\frac{2}{3}$ of the daily consumption as the penetration increases.
 
-        The test results of capacities larger than 100 MW h are not plotted. The reason is that there is no progress on the performance. It has been mentioned while analyzing the performance of 40\% penetration and in \hyperref[table_high_storage_40]{Table \ref*{table_high_storage_40}}. It is the wind power generation that first reach saturation point, that no matter how the capacity increases the performance can not further grow. Therefore, another conclusion is that the scale of the wind farm or the curtailment limitations should increase with the grow of storage capacity.
+        The test results of capacities larger than 100 MW h are not plotted. The reason is that there is no progress on the performance. It has been mentioned while analyzing the performance of 40\% penetration and in \hyperref[table_high_storage_40]{Table \ref*{table_high_storage_40}}. It is the wind power generation that first reaches saturation point, that no matter how the capacity increases the performance can not further grow. Therefore, another conclusion is that the scale of the wind farm or the curtailment limitations should increase with the growth of storage capacity.
 
+        \newpage
         \section{Limitations and problems}
         Originally, the objective of this project is not to model and simulate the impacts of EVs and the charging strategies. It was assumed that enough data can support the model of the energy use of a house and its appliances. Then, methodologies in machine learning and deep learning can be used to make predictions. However, searching for a data set with so many details is difficult and the existing researches on this topic have been enough many. Based on the understanding that the electrification in Orkney must introduce problems on EVs and clean power resources. The topic of modeling the impacts is selected.
 
@@ -1358,6 +1299,10 @@
         The simulation should have used more specific data for the appliances to characterize the randomness and instant power consumption. The lack of knowledge on power grid makes it impossible to analyze some specific attributes like loss, voltage transformation. This is also the reason why the metric is fully dependent on the current SoC, the only property that can be used.
 
         For the wind power modeling and simulation, the \emph{Markov Model} is a good solution. However, constrained by both time and knowledge, it is not used. It is believed that this probabilistic model can produce data with higher quality in simulation.
+
+        Additionally, the simulation framework did not take power grid specialized characters into consideration. For example, the loss of voltage conversion and the overall voltage level. If the accuracy or the degree of performance need to be improved, these details should be considered. Further more, the type of the batteries in the grid storage is not specialized. \hyperref[table_storage_characteristics]{Table \ref*{table_storage_characteristics}} has summarized prevailing battery technologies. Various types of batteries should be included to compose a multilayered grid storage to support short and long term services.
+
+        However, to support these considerations, data is the most important reason. The readers can acquire an impression from this project that most of the data used in the final simulation framework is not from what was collected from the official website. Instead, only the statistics were used, and the data of the grid was generated from probabilistic methods. The statistical features can be guaranteed, while shape of the data can vary drastically from that of the reality. Therefore, most of the time, the probabilistic methods can only be used to approximate the real scenario, but nothing can be better than using carefully collected real-world data. This principle is more effective in machine learning. In a famous paper published by \emph{Microsoft} researchers Michele Banko and Eric Brill, very different Machine Learning algorithms were tested on a very large data set \cite{paper:largedatasize}. Even a fairly simple algorithm performed almost identically well on a complex problem of natural language disambiguation once they were given enough data.
             
     \chapter*{Appendices}
     \addcontentsline{toc}{chapter}{Appendices}
